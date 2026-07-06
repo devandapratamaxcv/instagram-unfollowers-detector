@@ -480,7 +480,11 @@ let results = { nfb: [], nufb: [], mutual: [] };
 
 // ─── File Handling ──
 function parseInstagramJSON(text) {
-    const data = JSON.parse(text);
+    const raw = JSON.parse(text);
+    // following.json wraps data in { "relationships_following": [...] }
+    const data = Array.isArray(raw) ? raw
+        : (raw.relationships_following || raw.following || Object.values(raw).find(v => Array.isArray(v)) || []);
+
     const users = {};
     for (const entry of data) {
         if (entry.string_list_data) {
